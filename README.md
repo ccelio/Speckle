@@ -16,13 +16,19 @@
    course, we are forgoing the validation and results building infrastructure of
    SPEC. 
    
-**To compile binaries**:
+**Setup**:
 
    - set the $SPEC_DIR in gen_binaries.sh to point to your copy of CPU2006-1.2.
    - modify ./riscv.cfg as desired. It will get copied over to  $SPEC_DIR/configs. 
-   - run gen_binaries.sh
+   
+**To compile binaries**:
+
+        ./gen_binaries.sh
    
 **TODO**
-
+   
+   - add the ability to execute benchmarks.
+   - pull $SPEC_DIR from the environment. 
+   - better handle the .cfg files. Perhaps a script that modifies the example file? 
    - specify the SPEC input mode so we can properly symlink to the input datasets.
                     
