@@ -5,6 +5,7 @@
 **Requirements**:
 
    - you must have your own copy of SPEC CPU2006 v1.2. 
+   - you must have built the tools in SPEC CPU2006 v1.2. 
 
 **Details**:
 
@@ -31,4 +32,27 @@
    - pull $SPEC_DIR from the environment. 
    - better handle the .cfg files. Perhaps a script that modifies the example file? 
    - specify the SPEC input mode so we can properly symlink to the input datasets.
-                    
+
+**Building SPEC Tools**
+
+   These are the instructions that I had to follow to build the CPU2006 v1.2
+   tools from scratch on Intel amd64 machines running Ubuntu.
+
+   First, create a script (my_setup.sh) in cpu2006-1.2/tools/src with the following code:
+
+        #!/bin/bash
+        PERLFLAGS=-Uplibpth=
+        for i in `gcc -print-search-dirs | grep libraries | cut -f2- -d= | tr ':' '\n' | grep -v /gcc`; do
+            PERLFLAGS="$PERLFLAGS -Aplibpth=$i"
+        done
+        export PERLFLAGS
+        echo $PERLFLAGS
+        export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin:/usr/local/bin:/usr/bin:/bin
+
+   Then:
+
+        cd cpu2006-1.2/tools/src
+        source my_setup.sh
+        ./buildtools
+
+
