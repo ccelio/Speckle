@@ -12,9 +12,8 @@ ${SPEC_DIR:?"Please set the SPEC_DIR environment variable to point to your copy 
 #CMD_DIR=$PWD/commands/
 
 # the integer set
-#BENCHMARKS=(400.perlbench 401.bzip2)
-BENCHMARKS=(401.bzip2)
-#BENCHMARKS=(400.perlbench 401.bzip2 403.gcc 429.mcf 445.gobmk 456.hmmer 458.sjeng 462.libquantum 464.h264ref 471.omnetpp 473.astar 483.xalancbmk)
+#BENCHMARKS=(401.bzip2)
+BENCHMARKS=(400.perlbench 401.bzip2 403.gcc 429.mcf 445.gobmk 456.hmmer 458.sjeng 462.libquantum 464.h264ref 471.omnetpp 473.astar 483.xalancbmk)
 
 BUILD_DIR=$PWD/build
 mkdir -p build;
@@ -23,10 +22,12 @@ mkdir -p build;
 cp $BUILD_DIR/../riscv.cfg $SPEC_DIR/config/riscv.cfg 
 
 # compile the binaries
-#cd $SPEC_DIR; . ./shrc; time runspec --config riscv --action scrub int
 cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup int
+
+#cd $SPEC_DIR; . ./shrc; time runspec --config riscv --action scrub int
 #cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size train --action setup int
 #cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size ref --action setup int
+
 
 
 # copy back over the binaries.  Fuck xalancbmk for being different.
@@ -39,10 +40,13 @@ for b in ${BENCHMARKS[@]}; do
       SHORT_EXE=Xalan #WTF SPEC???
    fi
    BMK_DIR=$SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_riscv64.0000;
+   
+   echo "ls $SPEC_DIR/benchspec/CPU2006/$b/run"
    ls $SPEC_DIR/benchspec/CPU2006/$b/run
 #   cp $BMK_DIR/${SHORT_EXE}_base.riscv64 $BUILD_DIR/$b
 
-   ln -s $BMK_DIR $BUILD_DIR/${b}_test
+   echo "ln -s $BMK_DIR $BUILD_DIR/${b}_test"
+   ln -sf $BMK_DIR $BUILD_DIR/${b}_test
   
    # now copy in ref
    #BMK_DIR=$SPEC_DIR/benchspec/CPU2006/$b/run/run_base_ref_riscv64.0000;
@@ -59,20 +63,20 @@ for b in ${BENCHMARKS[@]}; do
    
 done
 
-for b in ${BENCHMARKS[@]}; do
-
-   cd $BUILD_DIR/${b}_test
-   SHORT_EXE=${b##*.} # cut off the numbers ###.short_exe
-   if [ $b == "483.xalancbmk" ]; then 
-      SHORT_EXE=Xalan #WTF SPEC???
-   fi
-   
-   # read the control file
-   IFS=$'\n' read -d '' -r -a commands < control
-   
-   for input in "${commands[@]}"; do
-      echo ${input}
-      echo "cd $PWD;" spike pk -c ${SHORT_EXE}_base.riscv64 ${input} >> $CMD_FILE
-   done
-
-done
+#for b in ${BENCHMARKS[@]}; do
+#
+#   cd $BUILD_DIR/${b}_test
+#   SHORT_EXE=${b##*.} # cut off the numbers ###.short_exe
+#   if [ $b == "483.xalancbmk" ]; then 
+#      SHORT_EXE=Xalan #WTF SPEC???
+#   fi
+#   
+#   # read the control file
+#   IFS=$'\n' read -d '' -r -a commands < control
+#   
+#   for input in "${commands[@]}"; do
+#      echo ${input}
+#      echo "cd $PWD;" spike pk -c ${SHORT_EXE}_base.riscv64 ${input} >> $CMD_FILE
+#   done
+#
+#done
