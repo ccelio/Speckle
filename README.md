@@ -38,7 +38,16 @@
    These are the instructions that I had to follow to build the CPU2006 v1.2
    tools from scratch on Intel amd64 machines running Ubuntu.
 
-   First, create a script (my_setup.sh) in cpu2006-1.2/tools/src with the following code:
+   First, you can try:
+
+        cd $SPEC_DIR/
+        ./install.sh
+
+   Hopefully that works. 
+   
+   Otherwise, you can also try installing the tools from scratch.
+   Begin by creating a script (my_setup.sh) in cpu2006-1.2/tools/src with the
+   following code:
 
         #!/bin/bash
         PERLFLAGS=-Uplibpth=
