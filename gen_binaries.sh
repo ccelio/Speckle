@@ -20,7 +20,7 @@ mkdir -p build;
 
 # compile the binaries
 if [ "$1" = "compile" ]; then
-   echo "Compiling SPEC..."
+   echo "Compiling SPEC... but only TEST INPUT! [TODO]"
    # copy over the config file we will use to compile the benchmarks
    cp $BUILD_DIR/../riscv.cfg $SPEC_DIR/config/riscv.cfg 
    cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup int
