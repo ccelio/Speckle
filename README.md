@@ -24,7 +24,9 @@
    
 **To compile binaries**:
 
-        ./gen_binaries.sh
+        ./gen_binaries.sh compile
+
+   You only need to compile SPEC once. It should take about a minute. 
    
 **TODO**
    

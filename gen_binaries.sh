@@ -18,11 +18,13 @@ BENCHMARKS=(400.perlbench 401.bzip2 403.gcc 429.mcf 445.gobmk 456.hmmer 458.sjen
 BUILD_DIR=$PWD/build
 mkdir -p build;
 
-# copy over the config file we will use to compile the benchmarks
-cp $BUILD_DIR/../riscv.cfg $SPEC_DIR/config/riscv.cfg 
-
 # compile the binaries
-cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup int
+if [ "$1" = "compile" ]; then
+   echo "Compiling SPEC..."
+   # copy over the config file we will use to compile the benchmarks
+   cp $BUILD_DIR/../riscv.cfg $SPEC_DIR/config/riscv.cfg 
+   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup int
+fi
 
 #cd $SPEC_DIR; . ./shrc; time runspec --config riscv --action scrub int
 #cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size train --action setup int
