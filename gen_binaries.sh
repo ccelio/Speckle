@@ -8,6 +8,8 @@
 
 ${SPEC_DIR:?"Please set the SPEC_DIR environment variable to point to your copy of SPEC CPU2006."}
 
+CONFIGFILE?=riscv.cfg
+
 #CMD_FILE=$PWD/commands.txt
 #CMD_DIR=$PWD/commands/
 
@@ -22,13 +24,12 @@ mkdir -p build;
 if [ "$1" = "compile" ]; then
    echo "Compiling SPEC... but only TEST INPUT! [TODO]"
    # copy over the config file we will use to compile the benchmarks
-   cp $BUILD_DIR/../riscv.cfg $SPEC_DIR/config/riscv.cfg 
+   cp $BUILD_DIR/../${CONFIGFILE} $SPEC_DIR/config/${CONFIGFILE}
+#   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action scrub int
    cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup int
+#   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size train --action setup int
+#   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size ref --action setup int
 fi
-
-#cd $SPEC_DIR; . ./shrc; time runspec --config riscv --action scrub int
-#cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size train --action setup int
-#cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size ref --action setup int
 
 
 
