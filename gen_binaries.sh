@@ -72,10 +72,16 @@ if [ "$compileFlag" = true ]; then
       fi
       BMK_DIR=$SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_riscv64.0000;
       
+      echo ""
       echo "ls $SPEC_DIR/benchspec/CPU2006/$b/run"
       ls $SPEC_DIR/benchspec/CPU2006/$b/run
+      ls $SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_riscv64.0000
+      echo ""
 
-      echo "ln -s $BMK_DIR $BUILD_DIR/${b}_test"
+      echo "ln -sf $BMK_DIR $BUILD_DIR/${b}_test (and unlink previous copy)"
+      if [ -d $BUILD_DIR/${b}_test ]; then
+         unlink $BUILD_DIR/${b}_test
+      fi
       ln -sf $BMK_DIR $BUILD_DIR/${b}_test
 
       # read the control file
@@ -116,4 +122,5 @@ if [ "$runFlag" = true ]; then
 
 fi
 
+echo ""
 echo "Done!"
