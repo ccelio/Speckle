@@ -2,8 +2,8 @@
 
 #############
 # TODO
-# handle test, training, and ref input sets
-# cmds/401.bzip2.test.cmd
+#  * handle test, training, and ref input sets
+#  * auto-handle output file generation
 
 if [ -z  "$SPEC_DIR" ]; then 
    echo "  Please set the SPEC_DIR environment variable to point to your copy of SPEC CPU2006."
@@ -16,6 +16,8 @@ CMD_FILE=commands.txt
 
 # the integer set
 #BENCHMARKS=(401.bzip2)
+#BENCHMARKS=(445.gobmk)
+#BENCHMARKS=(400.perlbench) 
 BENCHMARKS=(400.perlbench 401.bzip2 403.gcc 429.mcf 445.gobmk 456.hmmer 458.sjeng 462.libquantum 464.h264ref 471.omnetpp 473.astar 483.xalancbmk)
 
 # idiomatic parameter and option handling in sh
@@ -56,8 +58,8 @@ if [ "$compileFlag" = true ]; then
    # copy over the config file we will use to compile the benchmarks
    cp $BUILD_DIR/../${CONFIGFILE} $SPEC_DIR/config/${CONFIGFILE}
 #   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action scrub int
-   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup bzip2
 #   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup int
+   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action onlyrun int
 #   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size train --action setup int
 #   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size ref --action setup int
 
@@ -78,20 +80,14 @@ if [ "$compileFlag" = true ]; then
       ls $SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_riscv64.0000
       echo ""
 
-      echo "ln -sf $BMK_DIR $BUILD_DIR/${b}_test (and unlink previous copy)"
+      # make a symlink to SPEC (to prevent data duplication for huge input files)
+      echo "ln -sf $BMK_DIR $BUILD_DIR/${b}_test"
       if [ -d $BUILD_DIR/${b}_test ]; then
+         echo "unlink $BUILD_DIR/${b}_test"
          unlink $BUILD_DIR/${b}_test
       fi
       ln -sf $BMK_DIR $BUILD_DIR/${b}_test
 
-      # read the control file
-      cd $BUILD_DIR/${b}_test
-      IFS=$'\n' read -d '' -r -a commands < control
-
-      # build command file
-      for input in "${commands[@]}"; do
-         echo "cd $PWD;" ${RUN} ${SHORT_EXE}_base.riscv64 ${input} >> $BUILD_DIR/$CMD_FILE
-      done
    done
 fi
 
@@ -107,15 +103,15 @@ if [ "$runFlag" = true ]; then
          SHORT_EXE=Xalan #WTF SPEC???
       fi
       
-      # read the control file
-      IFS=$'\n' read -d '' -r -a commands < control
-      #IFS=$'\n' read -d '' -r -a commands < commands/${b}.test.cmd 
+      # read the command file
+      IFS=$'\n' read -d '' -r -a commands < $BUILD_DIR/../commands/${b}.test.cmd
 
-      CMD_FILE=${BUILD_DIR}/../commands.txt
       for input in "${commands[@]}"; do
-         echo "Running " ${b} ${input} " ... "
-         # build command file
-         ${RUN} ${SHORT_EXE}_base.riscv64 ${input} 
+         if [[ ${input:0:1} != '#' ]]; then # allow us to comment out lines in the cmd files
+            echo "~~~Running ${b}"
+            echo "  ${RUN} ${SHORT_EXE}_base.riscv64 ${input}"
+            eval ${RUN} ${SHORT_EXE}_base.riscv64 ${input}
+         fi
       done
    
    done

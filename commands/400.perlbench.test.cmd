@@ -1,0 +1,8 @@
+-I. -I./lib attrs.pl
+-I. -I./lib gv.pl
+-I. -I./lib makerand.pl
+-I. -I./lib pack.pl
+-I. -I./lib redef.pl
+-I. -I./lib ref.pl
+-I. -I./lib regmesg.pl
+-I. -I./lib test.pl
