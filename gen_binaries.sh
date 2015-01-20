@@ -12,6 +12,7 @@ fi
 
 CONFIGFILE=riscv.cfg
 RUN="spike pk -c "
+CMD_FILE=commands.txt
 
 # the integer set
 BENCHMARKS=(401.bzip2)
@@ -45,13 +46,13 @@ echo "  run    : " $runFlag
 echo ""
 
 
-
 BUILD_DIR=$PWD/build
 mkdir -p build;
 
 # compile the binaries
 if [ "$compileFlag" = true ]; then
    echo "Compiling SPEC... but only TEST INPUT! [TODO]"
+   rm -f $BUILD_DIR/$CMD_FILE # we'll rebuild this from the SPEC control files
    # copy over the config file we will use to compile the benchmarks
    cp $BUILD_DIR/../${CONFIGFILE} $SPEC_DIR/config/${CONFIGFILE}
 #   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action scrub int
@@ -73,30 +74,46 @@ if [ "$compileFlag" = true ]; then
       
       echo "ls $SPEC_DIR/benchspec/CPU2006/$b/run"
       ls $SPEC_DIR/benchspec/CPU2006/$b/run
-   #   cp $BMK_DIR/${SHORT_EXE}_base.riscv64 $BUILD_DIR/$b
 
       echo "ln -s $BMK_DIR $BUILD_DIR/${b}_test"
       ln -sf $BMK_DIR $BUILD_DIR/${b}_test
 
+      # read the control file
+      cd $BUILD_DIR/${b}_test
+      IFS=$'\n' read -d '' -r -a commands < control
+
+      # build command file
+      for input in "${commands[@]}"; do
+         echo "cd $PWD;" ${RUN} ${SHORT_EXE}_base.riscv64 ${input} >> $BUILD_DIR/$CMD_FILE
+      done
    done
 fi
 
-#for b in ${BENCHMARKS[@]}; do
-#
-#   cd $BUILD_DIR/${b}_test
-#   SHORT_EXE=${b##*.} # cut off the numbers ###.short_exe
-#   if [ $b == "483.xalancbmk" ]; then 
-#      SHORT_EXE=Xalan #WTF SPEC???
-#   fi
-#   
-#   # read the control file
-#   IFS=$'\n' read -d '' -r -a commands < control
-#   
-#   for input in "${commands[@]}"; do
-#      echo ${input}
-#      echo "cd $PWD;" spike pk -c ${SHORT_EXE}_base.riscv64 ${input} >> $CMD_FILE
-#   done
-#
-#done
+# running the binaries/building the command file
+# we could also just run through BUILD_DIR/CMD_FILE and run those...
+if [ "$runFlag" = true ]; then
+
+   for b in ${BENCHMARKS[@]}; do
+   
+      cd $BUILD_DIR/${b}_test
+      SHORT_EXE=${b##*.} # cut off the numbers ###.short_exe
+      if [ $b == "483.xalancbmk" ]; then 
+         SHORT_EXE=Xalan #WTF SPEC???
+      fi
+      
+      # read the control file
+      IFS=$'\n' read -d '' -r -a commands < control
+      #IFS=$'\n' read -d '' -r -a commands < commands/${b}.test.cmd 
+
+      CMD_FILE=${BUILD_DIR}/../commands.txt
+      for input in "${commands[@]}"; do
+         echo "Running " ${b} ${input} " ... "
+         # build command file
+         ${RUN} ${SHORT_EXE}_base.riscv64 ${input} 
+      done
+   
+   done
+
+fi
 
 echo "Done!"
