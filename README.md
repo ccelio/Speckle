@@ -1,11 +1,12 @@
 **Purpose**:
 
-   The goal of this repository is to help you compile and run SPEC.
+   The goal of this repository is to help you compile and run SPEC. This will
+   NOT verify the output of SPEC.
 
 **Requirements**:
 
    - you must have your own copy of SPEC CPU2006 v1.2. 
-   - you must have built the tools in SPEC CPU2006 v1.2. 
+   - you must have built the tools in SPEC CPU2006 v1.2 (see below for help). 
 
 **Details**:
 
@@ -19,21 +20,30 @@
    
 **Setup**:
 
-   - set the $SPEC_DIR in gen_binaries.sh to point to your copy of CPU2006-1.2.
-   - modify ./riscv.cfg as desired. It will get copied over to  $SPEC_DIR/configs. 
+   - set the $SPEC_DIR variable in your environment to point to your copy of CPU2006-1.2.
+   - modify Speckle/riscv.cfg as desired. It will get copied over to
+     $SPEC_DIR/configs when compiling the benchmarks. 
+   - modify the BENCHMARKS variable in gen_binaries.sh as required to set which
+     benchmarks you would like to compile and run.
+   - modify the RUN variable in gen_binaries.sh as required to set how you
+     would like to run the binaries (e.g., RUN="spike pk" to run on the Spike
+     ISA simulator).
    
 **To compile binaries**:
 
-        ./gen_binaries.sh compile
+        ./gen_binaries.sh --compile
 
-   You only need to compile SPEC once. It should take about a minute. 
-   
+   You only need to compile SPEC once for a given SPEC input ("test", "train",
+   "ref"). It should take about a minute. 
+    
+**To run binaries**:
+
+        ./gen_binaries.sh --run
+    
 **TODO**
    
-   - add the ability to execute benchmarks.
-   - pull $SPEC_DIR from the environment. 
-   - better handle the .cfg files. Perhaps a script that modifies the example file? 
    - specify the SPEC input mode so we can properly symlink to the input datasets.
+
 
 **Building SPEC Tools**
 
