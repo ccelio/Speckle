@@ -15,14 +15,12 @@ RUN="spike pk -c "
 CMD_FILE=commands.txt
 
 # the integer set
-#BENCHMARKS=(401.bzip2)
-#BENCHMARKS=(445.gobmk)
-#BENCHMARKS=(400.perlbench) 
 BENCHMARKS=(400.perlbench 401.bzip2 403.gcc 429.mcf 445.gobmk 456.hmmer 458.sjeng 462.libquantum 464.h264ref 471.omnetpp 473.astar 483.xalancbmk)
 
 # idiomatic parameter and option handling in sh
 compileFlag=false
 runFlag=false
+copyFlag=false
 while test $# -gt 0
 do
    case "$1" in
@@ -32,10 +30,15 @@ do
         --run) 
             runFlag=true
             ;;
+        --copy)
+            copyFlag=true
+            ;;
         --*) echo "ERROR: bad option $1"
+            echo "  --compile (compile the SPEC benchmarks), --run (to run the benchmarks) --copy (copies, not symlinks, benchmarks to a new dir)"
             exit 1
             ;;
         *) echo "ERROR: bad argument $1"
+            echo "  --compile (compile the SPEC benchmarks), --run (to run the benchmarks) --copy (copies, not symlinks, benchmarks to a new dir)"
             exit 2
             ;;
     esac
@@ -45,23 +48,27 @@ done
 echo "== Speckle Options =="
 echo "  compile: " $compileFlag
 echo "  run    : " $runFlag
+echo "  copy   : " $copyFlag
 echo ""
 
 
 BUILD_DIR=$PWD/build
+COPY_DIR=$PWD/riscv-spec-test
 mkdir -p build;
 
 # compile the binaries
 if [ "$compileFlag" = true ]; then
    echo "Compiling SPEC... but only TEST INPUT! [TODO]"
-   rm -f $BUILD_DIR/$CMD_FILE # we'll rebuild this from the SPEC control files
    # copy over the config file we will use to compile the benchmarks
    cp $BUILD_DIR/../${CONFIGFILE} $SPEC_DIR/config/${CONFIGFILE}
+   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup int
 #   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action scrub int
-#   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup int
-   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action onlyrun int
-#   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size train --action setup int
 #   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size ref --action setup int
+
+   if [ "$copyFlag" = true ]; then
+      rm -rf $COPY_DIR
+      mkdir -p $COPY_DIR
+   fi
 
    # copy back over the binaries.  Fuck xalancbmk for being different.
    # Do this for each input type.
@@ -88,6 +95,21 @@ if [ "$compileFlag" = true ]; then
       fi
       ln -sf $BMK_DIR $BUILD_DIR/${b}_test
 
+      if [ "$copyFlag" = true ]; then
+         echo "---- copying benchmarks ----- "
+         mkdir -p $COPY_DIR/$b
+         cp -r $BUILD_DIR/../commands $COPY_DIR/commands
+         cp $BUILD_DIR/../run.sh $COPY_DIR/run.sh
+         for f in $BMK_DIR/*; do
+            echo $f
+            if [[ -d $f ]]; then
+               cp -r $f $COPY_DIR/$b/$(basename "$f")
+            else
+               cp $f $COPY_DIR/$b/$(basename "$f")
+            fi
+         done
+         mv $COPY_DIR/$b/${SHORT_EXE}_base.riscv64 $COPY_DIR/$b/${SHORT_EXE}
+      fi
    done
 fi
 

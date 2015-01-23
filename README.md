@@ -44,6 +44,13 @@
 
         ./gen_binaries.sh --run
 
+**Copy benchmarks**
+
+   By default, benchmarks are compiled and then symlinked into build/. However,
+   for portability reasons, you can use "--compile --copy" to copy all the
+   input files and binaries into a new directory. This directory will contain a
+   run.sh script and the commands/ directory needed to run SPEC anywhere.
+
 
 **TODO**
    
