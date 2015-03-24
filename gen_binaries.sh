@@ -10,7 +10,9 @@ if [ -z  "$SPEC_DIR" ]; then
    exit 1
 fi
 
-CONFIGFILE=riscv.cfg
+#CONFIG=arm
+CONFIG=riscv
+CONFIGFILE=${CONFIG}.cfg
 RUN="spike pk -c "
 CMD_FILE=commands.txt
 
@@ -53,7 +55,7 @@ echo ""
 
 
 BUILD_DIR=$PWD/build
-COPY_DIR=$PWD/riscv-spec-test
+COPY_DIR=$PWD/$CONFIG-spec-test
 mkdir -p build;
 
 # compile the binaries
@@ -61,9 +63,9 @@ if [ "$compileFlag" = true ]; then
    echo "Compiling SPEC... but only TEST INPUT! [TODO]"
    # copy over the config file we will use to compile the benchmarks
    cp $BUILD_DIR/../${CONFIGFILE} $SPEC_DIR/config/${CONFIGFILE}
-   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action setup int
-#   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size test --action scrub int
-#   cd $SPEC_DIR; . ./shrc; time runspec --config riscv --size ref --action setup int
+   cd $SPEC_DIR; . ./shrc; time runspec --config $CONFIG --size test --action setup int
+#   cd $SPEC_DIR; . ./shrc; time runspec --config $CONFIG --size test --action scrub int
+#   cd $SPEC_DIR; . ./shrc; time runspec --config $CONFIG --size ref --action setup int
 
    if [ "$copyFlag" = true ]; then
       rm -rf $COPY_DIR
@@ -79,12 +81,12 @@ if [ "$compileFlag" = true ]; then
       if [ $b == "483.xalancbmk" ]; then 
          SHORT_EXE=Xalan #WTF SPEC???
       fi
-      BMK_DIR=$SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_riscv64.0000;
+      BMK_DIR=$SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_${CONFIG}.0000;
       
       echo ""
       echo "ls $SPEC_DIR/benchspec/CPU2006/$b/run"
       ls $SPEC_DIR/benchspec/CPU2006/$b/run
-      ls $SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_riscv64.0000
+      ls $SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_${CONFIG}.0000
       echo ""
 
       # make a symlink to SPEC (to prevent data duplication for huge input files)
@@ -108,7 +110,7 @@ if [ "$compileFlag" = true ]; then
                cp $f $COPY_DIR/$b/$(basename "$f")
             fi
          done
-         mv $COPY_DIR/$b/${SHORT_EXE}_base.riscv64 $COPY_DIR/$b/${SHORT_EXE}
+         mv $COPY_DIR/$b/${SHORT_EXE}_base.${CONFIG} $COPY_DIR/$b/${SHORT_EXE}
       fi
    done
 fi
@@ -131,8 +133,8 @@ if [ "$runFlag" = true ]; then
       for input in "${commands[@]}"; do
          if [[ ${input:0:1} != '#' ]]; then # allow us to comment out lines in the cmd files
             echo "~~~Running ${b}"
-            echo "  ${RUN} ${SHORT_EXE}_base.riscv64 ${input}"
-            eval ${RUN} ${SHORT_EXE}_base.riscv64 ${input}
+            echo "  ${RUN} ${SHORT_EXE}_base.${CONFIG} ${input}"
+            eval ${RUN} ${SHORT_EXE}_base.${CONFIG} ${input}
          fi
       done
    
