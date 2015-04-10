@@ -60,9 +60,8 @@
 
 **Known Issues**
 
-   - Currently, the riscv-pk does not support perlbench or omnetpp. This is due
-     to syscall #29 and syscall #35 being used.
-   - gobmk fails to read input files for gobmk.connection workload. 
+   - Currently, the riscv-pk does not support one of the perlbench.test workloads.
+       This is because it calls the fork syscall, which is not supported by riscv-pk.
 
 
 **Building SPEC Tools**
