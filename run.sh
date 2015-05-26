@@ -1,6 +1,8 @@
 #!/bin/bash
 
 TARGET_RUN="spike pk -c"
+INPUT_TYPE=test # THIS MUST BE ON LINE 4 for an external sed command to work!
+                # this allows us to externally set the INPUT_TYPE this script will execute
 
 BENCHMARKS=(400.perlbench 401.bzip2 403.gcc 429.mcf 445.gobmk 456.hmmer 458.sjeng 462.libquantum 464.h264ref 471.omnetpp 473.astar 483.xalancbmk)
 
@@ -17,7 +19,7 @@ for b in ${BENCHMARKS[@]}; do
    fi
    
    # read the command file
-   IFS=$'\n' read -d '' -r -a commands < ${base_dir}/commands/${b}.test.cmd
+   IFS=$'\n' read -d '' -r -a commands < ${base_dir}/commands/${b}.${INPUT_TYPE}.cmd
 
    # run each workload
    count=0

@@ -1,8 +1,9 @@
 #!/bin/bash
+#set -e
 
 #############
 # TODO
-#  * handle test, training, and ref input sets
+#  * allow the user to input their desired input set
 #  * auto-handle output file generation
 
 if [ -z  "$SPEC_DIR" ]; then 
@@ -10,14 +11,16 @@ if [ -z  "$SPEC_DIR" ]; then
    exit 1
 fi
 
-#CONFIG=arm
 CONFIG=riscv
 CONFIGFILE=${CONFIG}.cfg
 RUN="spike pk -c "
 CMD_FILE=commands.txt
+INPUT_TYPE=test
 
 # the integer set
 BENCHMARKS=(400.perlbench 401.bzip2 403.gcc 429.mcf 445.gobmk 456.hmmer 458.sjeng 462.libquantum 464.h264ref 471.omnetpp 473.astar 483.xalancbmk)
+#BENCHMARKS=(456.hmmer)
+#BENCHMARKS=(471.omnetpp)
 
 # idiomatic parameter and option handling in sh
 compileFlag=false
@@ -48,6 +51,8 @@ do
 done
 
 echo "== Speckle Options =="
+echo "  Config : " ${CONFIG}
+echo "  Input  : " ${INPUT_TYPE}
 echo "  compile: " $compileFlag
 echo "  run    : " $runFlag
 echo "  copy   : " $copyFlag
@@ -55,17 +60,16 @@ echo ""
 
 
 BUILD_DIR=$PWD/build
-COPY_DIR=$PWD/$CONFIG-spec-test
+COPY_DIR=$PWD/${CONFIG}-spec-${INPUT_TYPE}
 mkdir -p build;
 
 # compile the binaries
 if [ "$compileFlag" = true ]; then
-   echo "Compiling SPEC... but only TEST INPUT! [TODO]"
+   echo "Compiling SPEC..."
    # copy over the config file we will use to compile the benchmarks
    cp $BUILD_DIR/../${CONFIGFILE} $SPEC_DIR/config/${CONFIGFILE}
-   cd $SPEC_DIR; . ./shrc; time runspec --config $CONFIG --size test --action setup int
-#   cd $SPEC_DIR; . ./shrc; time runspec --config $CONFIG --size test --action scrub int
-#   cd $SPEC_DIR; . ./shrc; time runspec --config $CONFIG --size ref --action setup int
+   cd $SPEC_DIR; . ./shrc; time runspec --config ${CONFIG} --size ${INPUT_TYPE} --action setup bzip
+#   cd $SPEC_DIR; . ./shrc; time runspec --config ${CONFIG} --size ${INPUT_TYPE} --action scrub int
 
    if [ "$copyFlag" = true ]; then
       rm -rf $COPY_DIR
@@ -81,27 +85,28 @@ if [ "$compileFlag" = true ]; then
       if [ $b == "483.xalancbmk" ]; then 
          SHORT_EXE=Xalan #WTF SPEC???
       fi
-      BMK_DIR=$SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_${CONFIG}.0000;
+      BMK_DIR=$SPEC_DIR/benchspec/CPU2006/$b/run/run_base_${INPUT_TYPE}_${CONFIG}.0000;
       
       echo ""
       echo "ls $SPEC_DIR/benchspec/CPU2006/$b/run"
       ls $SPEC_DIR/benchspec/CPU2006/$b/run
-      ls $SPEC_DIR/benchspec/CPU2006/$b/run/run_base_test_${CONFIG}.0000
+      ls $SPEC_DIR/benchspec/CPU2006/$b/run/run_base_${INPUT_TYPE}_${CONFIG}.0000
       echo ""
 
       # make a symlink to SPEC (to prevent data duplication for huge input files)
-      echo "ln -sf $BMK_DIR $BUILD_DIR/${b}_test"
-      if [ -d $BUILD_DIR/${b}_test ]; then
-         echo "unlink $BUILD_DIR/${b}_test"
-         unlink $BUILD_DIR/${b}_test
+      echo "ln -sf $BMK_DIR $BUILD_DIR/${b}_${INPUT_TYPE}"
+      if [ -d $BUILD_DIR/${b}_${INPUT_TYPE} ]; then
+         echo "unlink $BUILD_DIR/${b}_${INPUT_TYPE}"
+         unlink $BUILD_DIR/${b}_${INPUT_TYPE}
       fi
-      ln -sf $BMK_DIR $BUILD_DIR/${b}_test
+      ln -sf $BMK_DIR $BUILD_DIR/${b}_${INPUT_TYPE}
 
       if [ "$copyFlag" = true ]; then
          echo "---- copying benchmarks ----- "
          mkdir -p $COPY_DIR/$b
          cp -r $BUILD_DIR/../commands $COPY_DIR/commands
          cp $BUILD_DIR/../run.sh $COPY_DIR/run.sh
+         sed -i '4s/.*/INPUT_TYPE='${INPUT_TYPE}' #this line was auto-generated from gen_binaries.sh/' $COPY_DIR/run.sh
          for f in $BMK_DIR/*; do
             echo $f
             if [[ -d $f ]]; then
@@ -121,14 +126,14 @@ if [ "$runFlag" = true ]; then
 
    for b in ${BENCHMARKS[@]}; do
    
-      cd $BUILD_DIR/${b}_test
+      cd $BUILD_DIR/${b}_${INPUT_TYPE}
       SHORT_EXE=${b##*.} # cut off the numbers ###.short_exe
       if [ $b == "483.xalancbmk" ]; then 
          SHORT_EXE=Xalan #WTF SPEC???
       fi
       
       # read the command file
-      IFS=$'\n' read -d '' -r -a commands < $BUILD_DIR/../commands/${b}.test.cmd
+      IFS=$'\n' read -d '' -r -a commands < $BUILD_DIR/../commands/${b}.${INPUT_TYPE}.cmd
 
       for input in "${commands[@]}"; do
          if [[ ${input:0:1} != '#' ]]; then # allow us to comment out lines in the cmd files
