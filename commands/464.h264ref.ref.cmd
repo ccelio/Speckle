@@ -1,0 +1,3 @@
+-d foreman_ref_encoder_baseline.cfg
+-d foreman_ref_encoder_main.cfg
+-d sss_encoder_main.cfg
