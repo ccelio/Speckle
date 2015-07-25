@@ -1,9 +1,9 @@
-gcc 166.i -o 166.s
-gcc 200.i -o 200.s
-gcc c-typeck.i -o c-typeck.s
-gcc cp-decl.i -o cp-decl.s
-gcc expr.i -o expr.s
-gcc expr2.i -o expr2.s
-gcc g23.i -o g23.s
-gcc s04.i -o s04.s
-gcc scilab.i -o scilab.s
+166.i -o 166.s
+200.i -o 200.s
+c-typeck.i -o c-typeck.s
+cp-decl.i -o cp-decl.s
+expr.i -o expr.s
+expr2.i -o expr2.s
+g23.i -o g23.s
+s04.i -o s04.s
+scilab.i -o scilab.s
