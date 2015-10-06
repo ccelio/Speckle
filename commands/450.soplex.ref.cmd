@@ -1,0 +1,2 @@
+-s1 -e -m45000 pds-50.mps
+-m3500 ref.mps
