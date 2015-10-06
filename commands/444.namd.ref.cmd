@@ -1,0 +1,1 @@
+--input namd.input --iterations 38 --output namd.out

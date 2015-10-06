@@ -126,9 +126,9 @@ if [ "$runFlag" = true ]; then
    
       cd $BUILD_DIR/${b}_${INPUT_TYPE}
       SHORT_EXE=${b##*.} # cut off the numbers ###.short_exe
-      if [ $b == "483.xalancbmk" ]; then 
-         SHORT_EXE=Xalan #WTF SPEC???
-      fi
+      # handle benchmarks that don't conform to the naming convention
+      if [ $b == "482.sphinx3" ]; then SHORT_EXE=sphinx_livepretend; fi
+      if [ $b == "483.xalancbmk" ]; then SHORT_EXE=Xalan; fi
       
       # read the command file
       IFS=$'\n' read -d '' -r -a commands < $BUILD_DIR/../commands/${b}.${INPUT_TYPE}.cmd
