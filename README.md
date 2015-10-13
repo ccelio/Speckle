@@ -1,15 +1,15 @@
-**Purpose**:
+**Purpose**
 
    The goal of this repository is to help you compile and run SPEC. This will
    NOT verify the output of SPEC.
 
-**Requirements**:
+**Requirements**
 
    - you must have your own copy of SPEC CPU2006 v1.2. 
    - you must have built the tools in SPEC CPU2006 v1.2 (see below for help). 
 
 
-**Details**:
+**Details**
 
    We will compile the binaries "in vivo", calling into the actual SPEC CPU2006
    directory. Once completed, the binaries are copied into this directory (./build). 
@@ -20,7 +20,7 @@
    SPEC. 
 
 
-**Setup**:
+**Setup**
 
    - set the $SPEC_DIR variable in your environment to point to your copy of CPU2006-1.2.
    - modify Speckle/riscv.cfg as desired. It will get copied over to
@@ -32,7 +32,7 @@
      ISA simulator).
 
 
-**To compile binaries**:
+**To compile binaries**
 
         ./gen_binaries.sh --compile
 
@@ -40,7 +40,7 @@
    "ref"). It should take about a minute. 
 
 
-**To run binaries**:
+**To run binaries**
 
         ./gen_binaries.sh --run
         
