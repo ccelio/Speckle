@@ -43,13 +43,23 @@
 **To run binaries**:
 
         ./gen_binaries.sh --run
+        
+   However, this only runs the binaries as specified by the $RUN variable in 
+   gen_binaries.sh, and it is running them via the symlinked directories in build/.
 
-**Copy benchmarks**
+**Building (and running) the binaries from a portable directory**
 
    By default, benchmarks are compiled and then symlinked into build/. However,
-   for portability reasons, you can use "--compile --copy" to copy all the
-   input files and binaries into a new directory. This directory will contain a
-   run.sh script and the commands/ directory needed to run SPEC anywhere.
+   for portability reasons, you can use: 
+   
+         ./gen_binaries.sh --compile --copy
+   
+   This will copy all the input files and binaries into a new directory (named after 
+   your CONFIG file and the INPUT size). This directory will contain a run.sh script 
+   and the commands/ directory needed to run SPEC anywhere!
+   
+   Modify the generated "./${CONFIG}-spec-{$INPUT}/run.sh" script as required to 
+   run the binaries in your new environment.  
 
 
 **TODO**
@@ -64,7 +74,8 @@
 
    - Currently, the riscv-pk does not support one of the perlbench.test workloads.
        This is because it calls the fork syscall, which is not supported by riscv-pk.
-   - Currently, the riscv-pk exhibits errors on some of the reference input sets (reccommended that you use Linux instead)
+   - Currently, the riscv-pk exhibits errors on some of the reference input sets 
+       (it is reccommended that you use Linux instead).
 
 
 **Building SPEC Tools**
