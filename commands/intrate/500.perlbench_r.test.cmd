@@ -1,0 +1,2 @@
+-I. -I./lib makerand.pl > makerand.out 2>> makerand.err
+-I. -I./lib test.pl > test.out 2>> test.err

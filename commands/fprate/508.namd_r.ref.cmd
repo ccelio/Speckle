@@ -1,0 +1,1 @@
+--input apoa1.input --output apoa1.ref.output --iterations 65 > namd.out 2>> namd.err
