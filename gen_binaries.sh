@@ -28,6 +28,9 @@ INPUT_TYPE="ref"
 # Supersets spec{speed,rate}, and all, are not supported
 SUITE_TYPE=intspeed
 
+# Output redirection redirect output to files
+REDIRECT=false
+
 # the integer set
 #BENCHMARKS=(400.perlbench 401.bzip2 403.gcc 429.mcf 445.gobmk 456.hmmer 458.sjeng 462.libquantum 464.h264ref 471.omnetpp 473.astar 483.xalancbmk)
 #BENCHMARKS=(603.bwaves_s)
@@ -36,6 +39,8 @@ SUITE_TYPE=intspeed
 compileFlag=false
 runFlag=false
 copyFlag=false
+genCommands=false
+genRunScripts=false
 while test $# -gt 0
 do
    case "$1" in
@@ -50,6 +55,9 @@ do
             ;;
         --genCommands)
             genCommandsFlag=true
+            ;;
+        --genRunScripts)
+            genRunScriptFlag=true
             ;;
         --*) echo "ERROR: bad option $1"
             echo "  --compile (compile the SPEC benchmarks), --run (to run the benchmarks) --copy (copies, not symlinks, benchmarks to a new dir)"
@@ -96,16 +104,16 @@ mkdir -p build;
 if [ "$compileFlag" = true ]; then
    echo "Compiling SPEC..."
    # copy over the config file we will use to compile the benchmarks
-   cd $SPEC_DIR; . ./shrc; time runcpu --config ${CONFIG} --action scrub ${SUITE_TYPE}
-   cp $BUILD_DIR/../${CONFIGFILE} $SPEC_DIR/config
-   cp $BUILD_DIR/../${H_CONFIGFILE} $SPEC_DIR/config
-   echo "Compiling target SPEC with config: ${CONFIGFILE}"
-   cd $SPEC_DIR; . ./shrc; time runcpu --verbose 10 --config ${CONFIG} --size ${INPUT_TYPE} \
-      --action build ${SUITE_TYPE} > ${BUILD_DIR}/${CONFIG}-${SUITE_TYPE}-build.log
-   echo "Compiling host SPEC and generating inputs with config: ${H_CONFIGFILE}"
-   cd $SPEC_DIR; . ./shrc; time runcpu --verbose 10 --config ${H_CONFIG} --size ${INPUT_TYPE} \
-      --action runsetup ${SUITE_TYPE} > ${BUILD_DIR}/${H_CONFIG}-${SUITE_TYPE}-build.log
-
+   #cd $SPEC_DIR; . ./shrc; time runcpu --config ${CONFIG} --action scrub ${SUITE_TYPE}
+   #cp $BUILD_DIR/../${CONFIGFILE} $SPEC_DIR/config
+   #cp $BUILD_DIR/../${H_CONFIGFILE} $SPEC_DIR/config
+   #echo "Compiling target SPEC with config: ${CONFIGFILE}"
+   #cd $SPEC_DIR; . ./shrc; time runcpu --verbose 10 --config ${CONFIG} --size ${INPUT_TYPE} \
+   #   --action build ${SUITE_TYPE} > ${BUILD_DIR}/${CONFIG}-${SUITE_TYPE}-build.log
+   #echo "Compiling host SPEC and generating inputs with config: ${H_CONFIGFILE}"
+   #cd $SPEC_DIR; . ./shrc; time runcpu --verbose 10 --config ${H_CONFIG} --size ${INPUT_TYPE} \
+   #   --action runsetup ${SUITE_TYPE} > ${BUILD_DIR}/${H_CONFIG}-${SUITE_TYPE}-build.log
+   set -x
    for b in ${benchmarks[@]}; do
       output_dir=${overlay_dir}/${SUITE_TYPE}/$b
       mkdir -p $output_dir
@@ -136,7 +144,9 @@ if [ "$compileFlag" = true ]; then
       IFS=$'\n' read -d '' -r -a commands < $BUILD_DIR/../commands/$SUITE_TYPE/${b}.${INPUT_TYPE}.cmd
       for input in "${commands[@]}"; do
          if [[ ${input:0:1} != '#' ]]; then # allow us to comment out lines in the cmd files
-            
+            if [[ "$REDIRECT" = false ]]; then 
+               input=${input% > *}
+            fi
             echo "./`basename ${target_bin}` ${input}" >> ${run_script}
          fi
       chmod +x $run_script
