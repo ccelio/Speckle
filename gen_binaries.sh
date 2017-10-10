@@ -128,9 +128,9 @@ if [ "$compileFlag" = true ]; then
       fi
 
       # Copy the inputs from the host build
-      inputs=(`find $host_bmk_dir ! -executable`)
+      inputs=(`find $host_bmk_dir/* -maxdepth 0 ! -executable -o -type d`)
       for input in ${inputs[@]}; do
-         cp -f $input $output_dir/
+         cp -rf $input $output_dir/`basename $input`
       done
 
       target_bin=`find $bmark_base_dir/exe/ -name "*${b_short_name}*${CONFIG}-64"`
