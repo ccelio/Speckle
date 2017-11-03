@@ -18,7 +18,6 @@ CONFIGFILE=${CONFIG}.cfg
 H_CONFIG=host
 H_CONFIGFILE=${H_CONFIG}.cfg
 
-
 # Output redirection redirection to files (names match a spec run)
 REDIRECT=true
 
@@ -133,7 +132,11 @@ if [ "$compileFlag" = true ]; then
          cp -rf $input $output_dir/`basename $input`
       done
 
-      target_bin=`find $bmark_base_dir/exe/ -name "*${b_short_name}*${CONFIG}-64"`
+      if [[ $b == "523.xalancbmk_r" ]]; then
+         target_bin=`find $bmark_base_dir/exe/ -name "cpuxalan*${CONFIG}-64"`
+      else
+         target_bin=`find $bmark_base_dir/exe/ -name "*${b_short_name}*${CONFIG}-64"`
+      fi
       cp -f ${target_bin} $output_dir/.
 
       # Generate a run script
@@ -144,13 +147,15 @@ if [ "$compileFlag" = true ]; then
       IFS=$'\n' read -d '' -r -a commands < $build_dir/../commands/$suite_type/${b}.${input_type}.cmd
       for input in "${commands[@]}"; do
          if [[ ${input:0:1} != '#' ]]; then # allow us to comment out lines in the cmd files
-            if [[ "$REDIRECT" = false ]]; then 
+            if [[ "$REDIRECT" = false ]]; then
                input=${input% > *}
             fi
+            echo "echo 'Running: ./`basename ${target_bin}` ${input}'">> ${run_script}
             echo "./`basename ${target_bin}` ${input}" >> ${run_script}
          fi
       done
       chmod +x $run_script
+
    done
 fi
 
