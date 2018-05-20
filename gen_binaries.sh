@@ -166,6 +166,9 @@ if [ "$compileFlag" = true ]; then
       done
       chmod +x $run_script
    done
+   # Copy the master runscript into the overlay directory
+   cp ${build_dir}/../spec17-run-scripts/${suite_type}.sh ${overlay_dir}/${suite_type}
+
 fi
 
 # Produces the .cmd files for a benchmark suite
