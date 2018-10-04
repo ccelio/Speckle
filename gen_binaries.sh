@@ -114,7 +114,7 @@ if [ "$compileFlag" = true ]; then
       --action runsetup ${suite_type} > ${build_dir}/${H_CONFIG}-${suite_type}-build.log
 
    for b in ${benchmarks[@]}; do
-      output_dir=${overlay_dir}/${suite_type}/$b
+      output_dir=${overlay_dir}/${suite_type}/${input_type}/$b
       mkdir -p $output_dir
       bmark_base_dir=$SPEC_DIR/benchspec/CPU/$b
       unprefixed=${b:4}
@@ -167,7 +167,7 @@ if [ "$compileFlag" = true ]; then
       chmod +x $run_script
    done
    # Copy the master runscript into the overlay directory
-   cp ${build_dir}/../spec17-run-scripts/${suite_type}.sh ${overlay_dir}/${suite_type}
+   cp ${build_dir}/../spec17-run-scripts/${suite_type}.sh ${overlay_dir}/${suite_type}/${input_type}
 
 fi
 
