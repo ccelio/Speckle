@@ -78,6 +78,18 @@
    Modify the generated "./${CONFIG}-spec-{$INPUT}/run.sh" script as required to 
    run the binaries in your new environment.  
 
+**To run binaries with metrics**
+In addition to directly running the benchmarks, there are also suite-specific
+scripts that collect performance metrics and configure tests. These will be
+available in build/. To run (for example) intspeed for the perl benchmark with
+one thread:
+
+    ./intspeed.sh 600.perlbench_s --threads 1
+
+Three outputs will be available in ~/outputs:
+   - BENCHNAME.out: stdout for the benchmark
+   - BENCHNAME.err: stderr for the benchmark
+   - BENCHNAME.csv: csv-formatted metrics
 
 **TODO**
    
