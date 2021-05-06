@@ -70,7 +70,18 @@ fi
 
 # Actually start the workload
 cd $work_dir/${bmark_name}
-./${runscript} > ~/output/${bmark_name}_${i}.out 2> ~/output/${bmark_name}_${i}.err
+
+if [ -z "$workload_num" ]; then
+    full_name=${bmark_name}
+else
+    full_name=${bmark_name}_${workload_num}
+fi
+
+# busybox has a bug in time where escape characters (e.g. \n) are not
+# interpreted correctly, we have to put the CSV header in manually
+echo "name,RealTime,UserTime,KernelTime" >> ~/output/${full_name}.csv
+/usr/bin/time -a -o ~/output/${full_name}.csv -f "${full_name},%e,%U,%S" \
+    ./${runscript} > ~/output/${full_name}.out 1> ~/output/${full_name}.err
 
 if [ -z "$DISABLE_COUNTERS" -a "$counters" -ne 0 ]; then
     stop_counters
